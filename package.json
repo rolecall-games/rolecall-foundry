@@ -8,7 +8,7 @@
     "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
     "lint": "tsc -noEmit -skipLibCheck"
   },
-  "keywords": ["foundry-vtt", "rolecall", "dnd"],
+  "keywords": ["foundry-vtt", "rolecall", "ttrpg"],
   "license": "0BSD",
   "devDependencies": {
     "esbuild": "0.25.5",
