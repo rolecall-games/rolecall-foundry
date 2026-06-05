@@ -79,6 +79,6 @@ src/
     canvas.ts        FUTURE: scene → map Scene (stub)
 ```
 
-The Rails side lives in `FriendsAndFables`:
+The Rails side lives in `rolecall-web` (the Rails app):
 `app/controllers/foundry/scenes_controller.rb` + `app/views/foundry/scenes/index.json.jbuilder`,
 authed by `PluginTokenAuthenticatable` (the same `rc_…` bearer tokens the Obsidian plugin uses).
