@@ -1,0 +1,9 @@
+{
+  "RC.Settings.ApiBaseUrl.Name": "Role Call API base URL",
+  "RC.Settings.ApiBaseUrl.Hint": "Role Call server origin. Leave the default unless you self-host.",
+  "RC.Settings.ApiToken.Name": "Role Call API token",
+  "RC.Settings.ApiToken.Hint": "Token generated on your game's Tokens page in Role Call. It identifies which game's scenes are pulled.",
+  "RC.Settings.SyncNow.Name": "Sync scenes now",
+  "RC.Settings.SyncNow.Label": "Sync from Role Call",
+  "RC.Settings.SyncNow.Hint": "Pull this game's scenes from Role Call into journal entries."
+}

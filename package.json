@@ -1,0 +1,17 @@
+{
+  "name": "rolecall-foundry-sync",
+  "version": "0.1.0",
+  "description": "Foundry VTT module that pulls Role Call campaign scenes into the world as journal entries.",
+  "type": "module",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+    "lint": "tsc -noEmit -skipLibCheck"
+  },
+  "keywords": ["foundry-vtt", "rolecall", "dnd"],
+  "license": "0BSD",
+  "devDependencies": {
+    "esbuild": "0.25.5",
+    "typescript": "^5.8.3"
+  }
+}

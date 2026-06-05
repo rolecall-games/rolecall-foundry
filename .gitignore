@@ -1,0 +1,14 @@
+# Dependencies
+node_modules
+
+# Build output (uploaded to GitHub releases instead)
+dist
+
+# Editor / OS
+.vscode
+.idea
+*.iml
+.DS_Store
+
+# Local-only developer notes / scratch
+developer/
