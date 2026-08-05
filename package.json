@@ -9,7 +9,7 @@
     "lint": "tsc -noEmit -skipLibCheck"
   },
   "keywords": ["foundry-vtt", "rolecall", "ttrpg"],
-  "license": "0BSD",
+  "license": "MIT",
   "devDependencies": {
     "esbuild": "0.25.5",
     "typescript": "^5.8.3"

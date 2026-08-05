@@ -1,9 +1,19 @@
 import { MODULE_ID, SETTINGS } from "./constants";
 import { runSync } from "./sync";
 
-// World-scoped settings: the Role Call origin and the per-game `rc_…` token
-// (generated on the game's Tokens page in Role Call — the token identifies
-// which game's scenes get pulled). Also registers a "Sync now" menu button.
+// Two settings with deliberately different scopes: the Role Call origin is
+// world-scoped (not a secret, and sharing it across clients is useful), and
+// the per-game `rc_…` token is CLIENT-scoped.
+//
+// The token must never be world-scoped. Foundry replicates world settings to
+// every connected client, so any player at the table could read the GM's
+// bearer out of the console — and that token grants GET /api/v1/foundry/scenes,
+// which returns gm_notes, NPC lore/stats and encounter details. The server
+// ships those secrets *on the assumption* that only a game's GMs hold the
+// token (see foundry_scenes_controller.ex). World scope voids that premise.
+//
+// Client scope costs the GM re-entering the token once per browser. That is
+// the whole trade, and sync is already a manual GM-gated action either way.
 export function registerSettings(): void {
   game.settings.register(MODULE_ID, SETTINGS.apiBaseUrl, {
     name: "RC.Settings.ApiBaseUrl.Name",
@@ -17,7 +27,7 @@ export function registerSettings(): void {
   game.settings.register(MODULE_ID, SETTINGS.apiToken, {
     name: "RC.Settings.ApiToken.Name",
     hint: "RC.Settings.ApiToken.Hint",
-    scope: "world",
+    scope: "client",
     config: true,
     type: String,
     default: "",

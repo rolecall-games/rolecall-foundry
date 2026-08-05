@@ -6,27 +6,8 @@ import type {
   NpcPayload,
   ScenePayload,
 } from "../types";
+import { esc, HTML_FORMAT, metaRow, section } from "./html";
 import type { SceneMapper } from "./index";
-
-const HTML_FORMAT = CONST?.JOURNAL_ENTRY_PAGE_FORMATS?.HTML ?? 1;
-
-// Escapes user-authored text before embedding it in journal HTML. Role Call
-// fields are plain text (read-aloud, notes), so we escape then convert newlines
-// to <br> for readable formatting.
-function esc(value: string | null | undefined): string {
-  if (!value) return "";
-  const div = document.createElement("div");
-  div.textContent = value;
-  return div.innerHTML.replace(/\n/g, "<br>");
-}
-
-function metaRow(label: string, value: string | null | undefined): string {
-  return value ? `<p><strong>${label}:</strong> ${esc(value)}</p>` : "";
-}
-
-function section(label: string, value: string | null | undefined): string {
-  return value ? `<h3>${label}</h3><p>${esc(value)}</p>` : "";
-}
 
 interface PageData {
   name: string;
@@ -101,10 +82,11 @@ export class JournalMapper implements SceneMapper {
   static readonly key = "journal";
   readonly key = JournalMapper.key;
 
-  async apply(scene: ScenePayload, folder: unknown): Promise<void> {
+  async apply(scene: ScenePayload, folder: unknown, sort: number): Promise<void> {
     await JournalEntry.create({
       name: scene.name,
       folder: (folder as { id?: string } | null)?.id ?? null,
+      sort,
       pages: buildPages(scene),
       flags: {
         [MODULE_ID]: { sceneId: scene.id, syncedAt: new Date().toISOString() },
