@@ -2,7 +2,10 @@
   "RC.Settings.ApiBaseUrl.Name": "Role Call API base URL",
   "RC.Settings.ApiBaseUrl.Hint": "Role Call server origin. Leave the default unless you self-host.",
   "RC.Settings.ApiToken.Name": "Role Call API token",
-  "RC.Settings.ApiToken.Hint": "Token generated on your game's Tokens page in Role Call. It identifies which game's scenes are pulled. Stored in this browser only, so it is never shared with your players — you will need to enter it again on another computer.",
+  "RC.Settings.ApiToken.Hint": "Filled automatically by Connect to Role Call, or paste a token from your game's Tokens page. It identifies which game's scenes are pulled. Stored in this browser only, so it is never shared with your players — you will need to connect again on another computer.",
+  "RC.Settings.Connect.Name": "Connect to Role Call",
+  "RC.Settings.Connect.Label": "Connect to Role Call",
+  "RC.Settings.Connect.Hint": "Link this Foundry client to a Role Call campaign — sign in (or create a free account) in your browser and the token is set up for you. No copy-paste.",
   "RC.Settings.SyncNow.Name": "Sync scenes now",
   "RC.Settings.SyncNow.Label": "Sync from Role Call",
   "RC.Settings.SyncNow.Hint": "Pull this game's scenes from Role Call into journal entries."

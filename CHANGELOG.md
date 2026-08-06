@@ -6,6 +6,12 @@ All notable changes to the Role Call Sync module for Foundry VTT.
 
 First release.
 
+- **Connect to Role Call** — device-code activation: click Connect (module
+  settings, or just hit Sync with no token set), approve in the browser —
+  signing up and creating the campaign right there if you don't have one —
+  and the token is stored for you. Pasting a token from the Tokens page
+  remains as the manual fallback.
+
 - Pull a Role Call campaign's **prep scenes** into Foundry as Journal Entries —
   one entry per scene, with pages for the read-aloud text, GM notes, and every
   member (NPCs, encounters, loot caches, magic items).

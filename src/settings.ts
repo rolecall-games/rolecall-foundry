@@ -1,4 +1,5 @@
 import { MODULE_ID, SETTINGS } from "./constants";
+import { runConnect } from "./connect";
 import { runSync } from "./sync";
 
 // Two settings with deliberately different scopes: the Role Call origin is
@@ -33,6 +34,18 @@ export function registerSettings(): void {
     default: "",
   });
 
+  // The primary activation path: the device-code connect flow — sign in (or
+  // sign up) in the browser, pick or create a campaign, and the token lands
+  // here by itself. Pasting a token stays available as the manual fallback.
+  game.settings.registerMenu(MODULE_ID, "connect", {
+    name: "RC.Settings.Connect.Name",
+    label: "RC.Settings.Connect.Label",
+    hint: "RC.Settings.Connect.Hint",
+    icon: "fas fa-plug",
+    type: ConnectMenu,
+    restricted: true,
+  });
+
   // A button in the module settings pane that triggers a sync immediately.
   game.settings.registerMenu(MODULE_ID, "syncNow", {
     name: "RC.Settings.SyncNow.Name",
@@ -62,6 +75,16 @@ class SyncNowMenu extends FormApplicationBase {
   async render(...args: unknown[]): Promise<unknown> {
     void args;
     await runSync();
+    return this;
+  }
+}
+
+// Same render-hijack shape as SyncNowMenu: the settings pane wants an
+// application class, but the connect flow draws its own overlay.
+class ConnectMenu extends FormApplicationBase {
+  async render(...args: unknown[]): Promise<unknown> {
+    void args;
+    await runConnect({ onConnected: () => void runSync() });
     return this;
   }
 }

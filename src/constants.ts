@@ -12,6 +12,10 @@ export const SETTINGS = {
 // See rolecall-meta/contracts/foundry-scenes.md — four things move together.
 export const EXPECTED_SYNC_VERSION = 3;
 
+// The device-code activation handshake's own version canary — independent of
+// the scenes feed's sync_version. See rolecall-meta/contracts/plugin-connect.md.
+export const CONNECT_PROTOCOL_VERSION = 1;
+
 // The single top-level Journal folder everything this module creates lives
 // under, with one child folder per synced game. Nesting stops there on
 // purpose: Foundry's FOLDER_MAX_DEPTH is 3, and a folder created past the

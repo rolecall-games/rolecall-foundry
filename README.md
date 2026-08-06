@@ -62,7 +62,22 @@ ln -s "$(pwd)" "$HOME/Library/Application Support/FoundryVTT/Data/modules/roleca
 
 Then launch Foundry (v13 or v14), enable **Role Call Sync** in your world's module settings.
 
-## Configure
+## Connect
+
+The fast path — no Role Call account needed up front:
+
+1. Click **Sync from Role Call** in the Journal sidebar (or **Connect to Role Call** in the
+   module settings). With no token set, the connect flow starts automatically.
+2. A browser tab opens on rolecall.games showing the same code as the Foundry overlay. Sign in —
+   or create a free account right there.
+3. Pick the campaign to sync with (or create one — the name is prefilled from your world title)
+   and click **Approve**.
+4. Switch back to Foundry: the token is picked up automatically and the first sync runs.
+
+The token is stored **in this browser only** (client scope — your players can never read it), so
+repeat the connect on each machine you GM from.
+
+### Manual fallback: paste a token
 
 In **Game Settings → Configure Settings → Role Call Sync**:
 
@@ -70,8 +85,6 @@ In **Game Settings → Configure Settings → Role Call Sync**:
 | ------------- | ------------------------------------------------------------------------------- |
 | API base URL  | `https://rolecall.games` (default). Change only if you self-host.               |
 | API token     | A token from your game's **Tokens** page in Role Call. It identifies the game.  |
-
-### Generate a token
 
 1. Sign in to Role Call and open the game whose scenes you want in Foundry.
 2. Go to the game's **Tokens** (Plugin access) page.

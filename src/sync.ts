@@ -1,5 +1,7 @@
 import { MODULE_ID, ROOT_FOLDER_NAME } from "./constants";
 import { fetchScenes, RoleCallApiError } from "./api";
+import { runConnect } from "./connect";
+import { getApiToken } from "./settings";
 import { activeMapper } from "./mappers";
 import { loreEntryData } from "./mappers/lore";
 
@@ -96,6 +98,14 @@ function countLabel(n: number, singular: string, plural: string): string {
 export async function runSync(): Promise<void> {
   if (!game.user?.isGM) {
     ui.notifications?.warn("Role Call: only a GM can sync this world.");
+    return;
+  }
+
+  // First run: no token yet. Offer the connect flow instead of a dead-end
+  // "paste a token" error, and let its success trigger the sync it was
+  // asked for.
+  if (!getApiToken()) {
+    await runConnect({ onConnected: () => void runSync() });
     return;
   }
 

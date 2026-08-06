@@ -7,3 +7,47 @@
 .rolecall-sync-sync-btn i {
   margin-right: 4px;
 }
+
+/* Connect flow waiting overlay — a raw <div>, not an ApplicationV2 window,
+   so it renders identically on the v13 and v14 dialog eras. */
+.rolecall-sync-connect-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.rolecall-sync-connect-card {
+  max-width: 420px;
+  padding: 20px 24px;
+  border-radius: 8px;
+  background: var(--color-cool-5, #1b1d24);
+  color: var(--color-text-light-primary, #f0f0e0);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+
+.rolecall-sync-connect-card a {
+  word-break: break-all;
+}
+
+.rolecall-sync-connect-code {
+  font-size: 1.8em;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  margin: 8px 0;
+  user-select: all;
+}
+
+.rolecall-sync-connect-status {
+  font-style: italic;
+  opacity: 0.85;
+}
+
+.rolecall-sync-connect-cancel {
+  margin-top: 8px;
+  width: auto;
+}
