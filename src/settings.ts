@@ -2,7 +2,7 @@ import { MODULE_ID, SETTINGS } from "./constants";
 import { runConnect } from "./connect";
 import { runSync } from "./sync";
 
-// Two settings with deliberately different scopes: the Role Call origin is
+// Two settings with deliberately different scopes: the RoleCall origin is
 // world-scoped (not a secret, and sharing it across clients is useful), and
 // the per-game `rc_…` token is CLIENT-scoped.
 //

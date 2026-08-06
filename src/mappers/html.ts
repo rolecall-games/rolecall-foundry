@@ -1,4 +1,4 @@
-// Shared page-building helpers for the mappers. Role Call fields are plain
+// Shared page-building helpers for the mappers. RoleCall fields are plain
 // text, so every one of them is escaped before it reaches journal HTML.
 
 export const HTML_FORMAT = CONST?.JOURNAL_ENTRY_PAGE_FORMATS?.HTML ?? 1;
@@ -17,7 +17,7 @@ export const OWNERSHIP: { NONE: number; OBSERVER: number } = {
 export const PAGE_SORT_STEP = 100_000;
 
 // Escapes user-authored text, then converts newlines to <br> so prose written
-// in Role Call keeps its shape in a journal page.
+// in RoleCall keeps its shape in a journal page.
 export function esc(value: string | null | undefined): string {
   if (!value) return "";
   const div = document.createElement("div");

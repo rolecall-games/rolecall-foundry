@@ -1,7 +1,8 @@
 {
   "name": "rolecall-foundry",
   "version": "0.1.0",
-  "description": "Foundry VTT module that pulls Role Call campaign scenes into the world as journal entries.",
+  "description": "Foundry VTT module that pulls RoleCall campaign scenes into the world as journal entries.",
+  "homepage": "https://rolecall.games",
   "type": "module",
   "scripts": {
     "dev": "node esbuild.config.mjs",

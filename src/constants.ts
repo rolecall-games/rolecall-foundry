@@ -11,7 +11,7 @@ export const SETTINGS = {
 // It is NOT an equality check any more: the response carries `min_sync_version`,
 // the oldest client the server's shape still reads, and `assertSyncVersion`
 // aborts only below that floor. So this number says "what we were built for",
-// and the server says "what still works" — a Role Call deploy no longer strands
+// and the server says "what still works" — a RoleCall deploy no longer strands
 // installed modules that haven't updated.
 // See rolecall-meta/contracts/foundry-scenes.md — four things move together.
 export const EXPECTED_SYNC_VERSION = 3;
@@ -25,4 +25,4 @@ export const CONNECT_PROTOCOL_VERSION = 1;
 // purpose: Foundry's FOLDER_MAX_DEPTH is 3, and a folder created past the
 // limit is created but never rendered — a silent failure worth staying well
 // clear of.
-export const ROOT_FOLDER_NAME = "Role Call";
+export const ROOT_FOLDER_NAME = "RoleCall";

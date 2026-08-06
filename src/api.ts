@@ -5,7 +5,7 @@ import type { ScenesResponse } from "./types";
 export class RoleCallApiError extends Error {}
 
 // The endpoint is token-gated, but a base URL pointed at something that isn't
-// Role Call — a reverse proxy's login page, a captive portal, a self-host typo
+// RoleCall — a reverse proxy's login page, a captive portal, a self-host typo
 // — still answers 200 with perfectly valid JSON. Check the two fields every
 // mapper dereferences so that lands here as a sentence the GM can act on,
 // rather than as a TypeError three files deep with no context.
@@ -37,7 +37,7 @@ function looksLikeScenesResponse(body: unknown): body is ScenesResponse {
 //   client >= min_sync_version, versions differ — readable, just not the exact
 //     build we were written against. Warn and carry on.
 //
-// `min_sync_version` absent means an older Role Call from before the window
+// `min_sync_version` absent means an older RoleCall from before the window
 // existed. Fall back to the exact compare it was deployed alongside: that
 // server has made no promise about older clients, so the old conservative
 // reading is the only safe one.
@@ -52,7 +52,7 @@ function assertSyncVersion(version: number, minVersion: number | undefined): voi
   const floor = minVersion ?? version;
 
   console.warn(
-    `Role Call Sync: server sync_version ${version} (min ${floor}) != expected ${EXPECTED_SYNC_VERSION}.`,
+    `RoleCall Sync: server sync_version ${version} (min ${floor}) != expected ${EXPECTED_SYNC_VERSION}.`,
   );
 
   if (EXPECTED_SYNC_VERSION < floor) {
@@ -62,7 +62,7 @@ function assertSyncVersion(version: number, minVersion: number | undefined): voi
   ui.notifications?.warn(game.i18n.format("rolecall-sync.Api.VersionTooOld", versions));
 }
 
-// Fetches the configured game's scenes from Role Call. Foundry runs in a
+// Fetches the configured game's scenes from RoleCall. Foundry runs in a
 // browser/Electron context, so we use the native fetch with a Bearer token —
 // the same `rc_…` token the Obsidian plugin uses. The token identifies the
 // game, so there's no game id to pass.
@@ -101,7 +101,7 @@ export async function fetchScenes(): Promise<ScenesResponse> {
   try {
     body = await res.json();
   } catch (err) {
-    console.error("Role Call Sync: response body was not JSON", err);
+    console.error("RoleCall Sync: response body was not JSON", err);
     throw new RoleCallApiError(game.i18n.localize("rolecall-sync.Api.MalformedResponse"));
   }
 

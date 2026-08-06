@@ -1,4 +1,4 @@
-// Mirrors the JSON contract served by Role Call's
+// Mirrors the JSON contract served by RoleCall's
 // GET /api/v1/foundry/scenes (see app/views/foundry/scenes/index.json.jbuilder).
 
 export interface NpcPayload {

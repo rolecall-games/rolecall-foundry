@@ -19,7 +19,7 @@ function journalEntries(): any[] {
   return (game.journal?.contents ?? game.journal ?? []) as any[];
 }
 
-// The single "Role Call" folder every synced game lives under. Flagged rather
+// The single "RoleCall" folder every synced game lives under. Flagged rather
 // than matched by name so a GM can rename it without the module orphaning
 // everything and building a second one beside it.
 async function findOrCreateRootFolder(): Promise<any> {
@@ -36,7 +36,7 @@ async function findOrCreateRootFolder(): Promise<any> {
   });
 }
 
-// The per-game folder, nested under the Role Call root.
+// The per-game folder, nested under the RoleCall root.
 //
 // Both sides of the flag comparison are String()-coerced: a folder created by
 // a pre-TypeID build carries a *number* gameId, and `1 === "game_01j…"` is
@@ -53,9 +53,9 @@ async function findOrCreateGameFolder(
   );
 
   // Adopt a folder from before nesting existed: it is the right folder, it is
-  // just sitting at the root under the old flat name ("Role Call — Hushvale").
+  // just sitting at the root under the old flat name ("RoleCall — Hushvale").
   // Re-parent AND rename, so a GM who synced under an older build keeps their
-  // entries and their links instead of ending up with "Role Call / Role Call —
+  // entries and their links instead of ending up with "RoleCall / RoleCall —
   // Hushvale". Only touch what is actually wrong — a GM who renamed the folder
   // themselves to something other than the old default keeps their name.
   if (existing) {
@@ -108,7 +108,7 @@ interface Counts {
   lore: number;
 }
 
-// The stable identity of a managed entry: the Role Call record it was built
+// The stable identity of a managed entry: the RoleCall record it was built
 // from. Scenes carry `sceneId`, lore notes carry `loreId`.
 function sourceKey(entry: any): string | null {
   const sceneId = entry.getFlag(MODULE_ID, "sceneId");
@@ -145,7 +145,7 @@ function fingerprint(data: EntryData): string {
 // Pages are stamped HERE rather than in the reconcile, so a page carries the
 // mark from the moment it is created. Stamping only on update leaves every
 // created page unowned, and an unowned page can never be cleaned up — content
-// pulled from Role Call would outlive its deletion there, including read-aloud
+// pulled from RoleCall would outlive its deletion there, including read-aloud
 // the GM had already shown the table.
 //
 // The fingerprint is taken before the stamp on purpose: the flag is bookkeeping
@@ -183,7 +183,7 @@ function planEntry(
 // on the next sync — the entry existed, we just weren't looking where it was.
 //
 // `gameId` is the fence around "world-wide". A world can be connected to two
-// Role Call games in turn, and an entry stamped for a different game is never
+// RoleCall games in turn, and an entry stamped for a different game is never
 // adopted: source ids are only globally unique from TypeID onward, and the
 // per-game integers that preceded them collide across games happily.
 //
@@ -296,7 +296,7 @@ async function inBatch<T>(
     await write(items);
     return items;
   } catch (err) {
-    console.error("Role Call Sync: batch write rejected — retrying one at a time", err);
+    console.error("RoleCall Sync: batch write rejected — retrying one at a time", err);
   }
 
   const landed: T[] = [];
@@ -305,7 +305,7 @@ async function inBatch<T>(
       await write([item]);
       landed.push(item);
     } catch (err) {
-      console.error(`Role Call Sync: failed to write ${describe(item)}`, err);
+      console.error(`RoleCall Sync: failed to write ${describe(item)}`, err);
     }
   }
   return landed;
@@ -326,7 +326,7 @@ async function createEntries(
     await JournalEntry.createDocuments(items.map((item) => item.data));
     return items;
   } catch (err) {
-    console.error("Role Call Sync: batch create rejected — retrying one at a time", err);
+    console.error("RoleCall Sync: batch create rejected — retrying one at a time", err);
   }
 
   const present = indexManagedEntries(gameId, folderId);
@@ -341,7 +341,7 @@ async function createEntries(
       await JournalEntry.createDocuments([item.data]);
       landed.push(item);
     } catch (err) {
-      console.error(`Role Call Sync: failed to create ${item.label}`, err);
+      console.error(`RoleCall Sync: failed to create ${item.label}`, err);
     }
   }
 
@@ -381,7 +381,7 @@ async function reconcileEntries(payload: ScenesResponse, folder: any): Promise<C
       desired.push(planEntry("scene", scene.id, `scene "${scene.name}"`, data, gameId));
     } catch (err) {
       failed.add(`scene:${scene.id}`);
-      console.error(`Role Call Sync: failed to map scene "${scene.name}"`, err);
+      console.error(`RoleCall Sync: failed to map scene "${scene.name}"`, err);
     }
   }
 
@@ -393,7 +393,7 @@ async function reconcileEntries(payload: ScenesResponse, folder: any): Promise<C
       desired.push(planEntry("lore", note.id, `lore note "${note.title}"`, data, gameId));
     } catch (err) {
       failed.add(`lore:${note.id}`);
-      console.error(`Role Call Sync: failed to map lore note "${note.title}"`, err);
+      console.error(`RoleCall Sync: failed to map lore note "${note.title}"`, err);
     }
   }
 
@@ -428,7 +428,7 @@ async function reconcileEntries(payload: ScenesResponse, folder: any): Promise<C
     }
 
     // `folder` is deliberately absent from the change. Where an entry lives is
-    // the GM's call: dragging one out of the Role Call folder is a decision
+    // the GM's call: dragging one out of the RoleCall folder is a decision
     // the module does not get to quietly undo once a sync.
     updates.push({
       item,
@@ -453,7 +453,7 @@ async function reconcileEntries(payload: ScenesResponse, folder: any): Promise<C
       await reconcilePages(pending.entry, pending.item.data.pages, migrating);
       repaged.push(pending);
     } catch (err) {
-      console.error(`Role Call Sync: failed to update the pages of ${pending.item.label}`, err);
+      console.error(`RoleCall Sync: failed to update the pages of ${pending.item.label}`, err);
     }
   }
 
@@ -496,7 +496,7 @@ function countLabel(n: number, singular: string, plural: string): string {
   return game.i18n.format(n === 1 ? singular : plural, { count: n });
 }
 
-// Orchestrates one sync: fetch the game's scenes and lore from Role Call, set
+// Orchestrates one sync: fetch the game's scenes and lore from RoleCall, set
 // up the folders, then reconcile the journal against what arrived.
 export async function runSync(): Promise<void> {
   if (!game.user?.isGM) {
@@ -522,7 +522,7 @@ export async function runSync(): Promise<void> {
       err instanceof RoleCallApiError
         ? err.message
         : game.i18n.localize("rolecall-sync.Error.Unknown");
-    console.error("Role Call Sync:", err);
+    console.error("RoleCall Sync:", err);
     ui.notifications?.error(game.i18n.format("rolecall-sync.Notify.Failed", { message }));
     return;
   }
@@ -532,7 +532,7 @@ export async function runSync(): Promise<void> {
   let folder: any;
   try {
     const root = await findOrCreateRootFolder();
-    if (!root) throw new Error("could not create the Role Call journal folder");
+    if (!root) throw new Error("could not create the RoleCall journal folder");
 
     folder = await findOrCreateGameFolder(payload.game.id, payload.game.name, root.id ?? null);
     if (!folder) throw new Error(`could not create the "${payload.game.name}" journal folder`);
@@ -541,7 +541,7 @@ export async function runSync(): Promise<void> {
     // cancelling, or a permissions edge. Without this the next line reads
     // .id off undefined and the "syncing…" toast never resolves, leaving no
     // error anywhere the GM can see.
-    console.error("Role Call Sync: could not prepare the journal folders", err);
+    console.error("RoleCall Sync: could not prepare the journal folders", err);
     ui.notifications?.error(game.i18n.localize("rolecall-sync.Notify.FolderFailed"));
     return;
   }
@@ -550,7 +550,7 @@ export async function runSync(): Promise<void> {
 
   // "Nothing landed" and "there was nothing to land" look identical from the
   // counts, and telling a GM their campaign is empty when in fact every write
-  // failed sends them to look in the wrong place — Role Call, where their
+  // failed sends them to look in the wrong place — RoleCall, where their
   // scenes plainly are — with the real errors sitting in a console they have
   // no reason to open.
   if (counts.scenes === 0 && counts.lore === 0) {

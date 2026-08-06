@@ -15,7 +15,7 @@ Hooks.once("ready", () => {
   if (mod) mod.api = { sync: runSync };
 });
 
-// Add a "Sync from Role Call" button to the Journal sidebar. Works across the
+// Add a "Sync from RoleCall" button to the Journal sidebar. Works across the
 // v13/v14 ApplicationV2 sidebar (native HTMLElement) and the legacy v12 jQuery
 // one. The V2 directory template doesn't guarantee a `.directory-header`, so we
 // try a few known anchors and fall back to the tab root — the button always

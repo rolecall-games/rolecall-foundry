@@ -1,16 +1,16 @@
-# Role Call Sync (Foundry VTT)
+# RoleCall Sync (Foundry VTT)
 
-A Foundry VTT module (**v13 & v14**) that pulls your [Role Call](https://rolecall.games) campaign
+A Foundry VTT module (**v13 & v14**) that pulls your [RoleCall](https://rolecall.games) campaign
 prep into your world as **journal entries**. Each scene becomes a Journal Entry with pages for the
 read-aloud text, your GM notes, and every member (NPCs, encounters, loot caches, magic items); each
 of your campaign **lore notes** becomes an entry alongside them.
 
-Everything lands under a single top-level **Role Call** folder, with one child folder per campaign:
+Everything lands under a single top-level **RoleCall** folder, with one child folder per campaign:
 
 ```
-📁 Role Call
+📁 RoleCall
    └── 📁 Hushvale                 ← your game
-       ├── 📄 The Tavern           ← scenes, in your Role Call order
+       ├── 📄 The Tavern           ← scenes, in your RoleCall order
        ├── 📄 The Sunken Road
        └── 📄 The Sunken Compact   ← lore notes, after the scenes
 ```
@@ -24,24 +24,24 @@ Everything lands under a single top-level **Role Call** folder, with one child f
 > Your API token is stored **per browser**, not in the world, so your players can never read it out
 > of the console. Entering it on a second computer is expected.
 
-> Role Call scenes are narrative prep bundles, not battlemaps — so they sync to journals today. Map
+> RoleCall scenes are narrative prep bundles, not battlemaps — so they sync to journals today. Map
 > canvases are on the roadmap; the `SceneMapper` interface (`src/mappers/index.ts`) is the seam a
-> map-Scene mapper drops into for when Role Call scenes carry map art.
+> map-Scene mapper drops into for when RoleCall scenes carry map art.
 
 ## What it does
 
-- Adds a **Sync from Role Call** button to the Journal sidebar (GM only) and a settings-pane button.
+- Adds a **Sync from RoleCall** button to the Journal sidebar (GM only) and a settings-pane button.
 - Pulls `GET /api/v1/foundry/scenes` for the game your token belongs to.
-- Files everything under **Role Call / &lt;Game&gt;**, one Journal Entry per scene and per lore note,
-  in the order Role Call has them (not alphabetical).
+- Files everything under **RoleCall / &lt;Game&gt;**, one Journal Entry per scene and per lore note,
+  in the order RoleCall has them (not alphabetical).
 - Re-syncing **updates entries in place**. Documents keep their ids, so every `@UUID[JournalEntry.…]`
   link you wrote, every map Note pin and every macro reference still resolves after a sync. Entries
-  are matched by the Role Call record they came from, wherever you filed them — move one out of the
+  are matched by the RoleCall record they came from, wherever you filed them — move one out of the
   folder and it is updated, not duplicated. An entry is deleted only when its scene or lore note is
-  gone from Role Call. Entries and pages you created yourself are never touched.
+  gone from RoleCall. Entries and pages you created yourself are never touched.
 - Macro-callable: `game.modules.get("rolecall-sync").api.sync()` — GM only.
 
-If you synced with an older build, the existing `Role Call — <Game>` folder is **adopted and moved**
+If you synced with an older build, the existing `RoleCall — <Game>` folder is **adopted and moved**
 under the new root rather than abandoned, so nothing is lost or duplicated.
 
 ## Showing a scene to your table
@@ -63,10 +63,10 @@ Leaving the entry GM-only keeps everything hidden regardless — raising it is w
 
 ## What it does *not* do (yet)
 
-- No map/canvas Scenes (no scene art in Role Call yet — see the `SceneMapper` seam).
+- No map/canvas Scenes (no scene art in RoleCall yet — see the `SceneMapper` seam).
 - No NPC → Actor conversion (needs per-system sheets: D&D 5e, Daggerheart).
 - No automatic/background sync — you click to pull.
-- Pull-only; it never writes back to Role Call.
+- Pull-only; it never writes back to RoleCall.
 
 ## Install (local dev)
 
@@ -80,13 +80,13 @@ npm run build          # → dist/module.js   (npm run dev to watch)
 ln -s "$(pwd)" "$HOME/Library/Application Support/FoundryVTT/Data/modules/rolecall-sync"
 ```
 
-Then launch Foundry (v13 or v14), enable **Role Call Sync** in your world's module settings.
+Then launch Foundry (v13 or v14), enable **RoleCall Sync** in your world's module settings.
 
 ## Connect
 
-The fast path — no Role Call account needed up front:
+The fast path — no RoleCall account needed up front:
 
-1. Click **Sync from Role Call** in the Journal sidebar (or **Connect to Role Call** in the
+1. Click **Sync from RoleCall** in the Journal sidebar (or **Connect to RoleCall** in the
    module settings). With no token set, the connect flow starts automatically.
 2. A browser tab opens on rolecall.games showing the same code as the Foundry overlay. Sign in —
    or create a free account right there.
@@ -99,21 +99,21 @@ repeat the connect on each machine you GM from.
 
 ### Manual fallback: paste a token
 
-In **Game Settings → Configure Settings → Role Call Sync**:
+In **Game Settings → Configure Settings → RoleCall Sync**:
 
 | Setting       | What goes here                                                                  |
 | ------------- | ------------------------------------------------------------------------------- |
 | API base URL  | `https://rolecall.games` (default). Change only if you self-host.               |
-| API token     | A token from your game's **Tokens** page in Role Call. It identifies the game.  |
+| API token     | A token from your game's **Tokens** page in RoleCall. It identifies the game.  |
 
-1. Sign in to Role Call and open the game whose scenes you want in Foundry.
+1. Sign in to RoleCall and open the game whose scenes you want in Foundry.
 2. Go to the game's **Tokens** (Plugin access) page.
 3. Click **Generate token**, name it `Foundry`, and copy it immediately — it's shown once.
 4. Paste it into the module's **API token** setting.
 
 ## Sync
 
-Click **Sync from Role Call** in the Journal sidebar, or run the macro
+Click **Sync from RoleCall** in the Journal sidebar, or run the macro
 `game.modules.get("rolecall-sync").api.sync()`. You'll get notifications for progress, the synced
 count, and any error (bad token, server, network).
 

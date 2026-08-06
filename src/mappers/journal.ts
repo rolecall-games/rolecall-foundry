@@ -137,7 +137,7 @@ function buildPages(scene: ScenePayload): PageData[] {
   return pages;
 }
 
-// Maps a Role Call scene to a single Foundry JournalEntry, one page per
+// Maps a RoleCall scene to a single Foundry JournalEntry, one page per
 // read-aloud / GM-notes block and one per member. Flagged with the source
 // sceneId so the sync orchestrator can find & reconcile it on the next run.
 export class JournalMapper implements SceneMapper {

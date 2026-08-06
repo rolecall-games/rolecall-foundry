@@ -134,7 +134,7 @@ function openOverlay(start: ConnectStart, popupOpened: boolean, state: { cancell
       },
     };
   } catch (err) {
-    console.warn("Role Call Sync: connect overlay failed to render", err);
+    console.warn("RoleCall Sync: connect overlay failed to render", err);
     return null;
   }
 }
@@ -161,7 +161,7 @@ export async function runConnect(opts: { onConnected?: () => void } = {}): Promi
       err instanceof RoleCallConnectError
         ? err.message
         : game.i18n.localize("rolecall-sync.Connect.Error.Unknown");
-    console.error("Role Call Sync:", err);
+    console.error("RoleCall Sync:", err);
     ui.notifications?.error(game.i18n.format("rolecall-sync.Connect.Notify.Failed", { message }));
     return;
   }

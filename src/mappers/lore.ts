@@ -28,7 +28,7 @@ export function loreEntryData(
         sort: PAGE_SORT_STEP,
         // GM-only by choice, not by omission. A scene's read-aloud is written
         // to be spoken at the table; campaign lore has no such promise behind
-        // it, so the closed default is the safe one until Role Call marks lore
+        // it, so the closed default is the safe one until RoleCall marks lore
         // player-safe on the wire. Don't "fix" this to OBSERVER.
         ownership: { default: OWNERSHIP.NONE },
         text: { content: body, format: HTML_FORMAT },

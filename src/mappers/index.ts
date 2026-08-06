@@ -24,7 +24,7 @@ export interface EntryData {
   flags: Record<string, unknown>;
 }
 
-// A mapper turns one Role Call scene into the data for Foundry document(s)
+// A mapper turns one RoleCall scene into the data for Foundry document(s)
 // inside the given folder. This is the seam that keeps the future open: today
 // only the journal mapper is registered; a mapper that builds real map Scenes
 // can be added here and selected by a setting without touching the sync
