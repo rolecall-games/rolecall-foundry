@@ -1,0 +1,126 @@
+name: Release
+
+# `dist/` is gitignored, so a tag on its own is not installable — this workflow
+# is the only thing that assembles a module a GM can actually enable.
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - run: npm ci
+
+      # `npm run build` typechecks before bundling, so a tag can't ship the
+      # class of break that motivated the lint job.
+      - run: npm run build
+
+      - name: Derive version from tag
+        id: version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::Tag '$GITHUB_REF_NAME' is not v<semver> — refusing to stamp it into module.json"
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          # A prerelease tag must not become /releases/latest, or every GM on a
+          # stable version gets offered a prerelease by the update poll described
+          # in the next step.
+          if [[ "$VERSION" == *-* ]]; then
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # THE TRAP. Two URLs point at module.json and they are not interchangeable:
+      #
+      #   .../releases/latest/download/module.json   <- the `manifest` field INSIDE
+      #     the shipped module.json. This is Foundry's update poll: the installed
+      #     module re-fetches this URL and compares versions, so it must stay
+      #     `latest` forever. Pin it to a version and the module can never see an
+      #     update again — it would poll its own version until the end of time.
+      #
+      #   .../releases/download/v0.1.0/module.json   <- what gets submitted to the
+      #     Foundry Package Release API. That submission must be version-specific;
+      #     Foundry rejects a manifest URL that would drift under it.
+      #
+      # Both resolve because this job publishes module.json as a release asset:
+      # GitHub serves the same file at the tag URL and at the /latest/ alias.
+      # This step therefore stamps ONLY `version` and leaves `manifest` alone —
+      # and asserts the field still says `latest`, so an edit that "helpfully"
+      # makes it version-specific fails here instead of silently killing updates.
+      - name: Stamp version into module.json
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          MANIFEST="$(jq -r '.manifest' module.json)"
+          case "$MANIFEST" in
+            */releases/latest/download/module.json) ;;
+            *)
+              echo "::error::module.json manifest is '$MANIFEST' — it must point at releases/latest/download/module.json or in-Foundry updates break"
+              exit 1
+              ;;
+          esac
+          jq --arg v "$VERSION" '.version = $v' module.json > module.json.tmp
+          mv module.json.tmp module.json
+
+      # Unzipping this into Data/modules/rolecall-sync/ has to yield a working
+      # module with no build step, so module.json sits at the zip root (no
+      # wrapping directory) alongside the built bundle and the paths module.json
+      # declares: dist/module.js, styles/rolecall.css, lang/en.json.
+      - name: Build module.zip
+        run: |
+          zip -r module.zip \
+            module.json \
+            dist/module.js \
+            styles/rolecall.css \
+            lang/en.json \
+            README.md \
+            LICENSE
+
+      - name: Verify zip layout
+        run: |
+          unzip -l module.zip
+          for f in module.json dist/module.js styles/rolecall.css lang/en.json README.md LICENSE; do
+            unzip -l module.zip "$f" >/dev/null 2>&1 || {
+              echo "::error::$f is missing from module.zip — the module would not load"
+              exit 1
+            }
+          done
+
+      # Both assets are required: module.zip is the `download`, module.json is
+      # the `manifest` — publishing only the zip leaves the update poll 404ing.
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PRERELEASE: ${{ steps.version.outputs.prerelease }}
+        run: |
+          FLAGS=()
+          if [[ "$PRERELEASE" == "true" ]]; then FLAGS+=(--prerelease); fi
+          gh release create "$GITHUB_REF_NAME" \
+            --title "$GITHUB_REF_NAME" \
+            --generate-notes \
+            "${FLAGS[@]}" \
+            module.zip \
+            module.json
+
+      # Submitting to the Foundry Package Release API lands here, once the
+      # package is approved and a FOUNDRY_PACKAGE_TOKEN secret exists. It POSTs
+      # the VERSION-SPECIFIC manifest URL (see the trap above):
+      #   https://github.com/<owner>/<repo>/releases/download/${{ github.ref_name }}/module.json

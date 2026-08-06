@@ -6,91 +6,156 @@ import type {
   NpcPayload,
   ScenePayload,
 } from "../types";
-import { esc, HTML_FORMAT, metaRow, section } from "./html";
-import type { SceneMapper } from "./index";
+import {
+  esc,
+  heading,
+  HTML_FORMAT,
+  metaRow,
+  OWNERSHIP,
+  PAGE_SORT_STEP,
+  placeholder,
+  section,
+} from "./html";
+import type { EntryData, PageData, SceneMapper } from "./index";
 
-interface PageData {
-  name: string;
-  type: "text";
-  title?: { show: boolean; level: number };
-  text: { content: string; format: number };
+// Every page builder returns its own ownership and leaves `sort` to buildPages,
+// which knows the position each page ends up in.
+type UnsortedPage = Omit<PageData, "sort">;
+
+function textPage(name: string, content: string, ownership: number): UnsortedPage {
+  return {
+    name,
+    type: "text",
+    ownership: { default: ownership },
+    text: { content, format: HTML_FORMAT },
+  };
 }
 
-function textPage(name: string, content: string): PageData {
-  return { name, type: "text", text: { content, format: HTML_FORMAT } };
-}
-
-function npcPage(npc: NpcPayload): PageData {
+function npcPage(npc: NpcPayload): UnsortedPage {
   const stats = npc.stats && Object.keys(npc.stats).length
-    ? `<h3>Stats</h3><pre>${esc(JSON.stringify(npc.stats, null, 2))}</pre>`
+    ? heading("rolecall-sync.Field.Stats") + `<pre>${esc(JSON.stringify(npc.stats, null, 2))}</pre>`
     : "";
   const content =
-    metaRow("Race", npc.race) +
-    metaRow("Archetype", npc.archetype) +
-    metaRow("Attitude", npc.attitude) +
-    section("Goals", npc.goals) +
-    section("Quirks", npc.quirks) +
-    section("Lore", npc.lore_note) +
+    metaRow("rolecall-sync.Field.Race", npc.race) +
+    metaRow("rolecall-sync.Field.Archetype", npc.archetype) +
+    metaRow("rolecall-sync.Field.Attitude", npc.attitude) +
+    section("rolecall-sync.Field.Goals", npc.goals) +
+    section("rolecall-sync.Field.Quirks", npc.quirks) +
+    section("rolecall-sync.Field.Lore", npc.lore_note) +
     stats;
-  return textPage(`NPC: ${npc.name}`, content || "<p><em>No details.</em></p>");
+  return textPage(
+    game.i18n.format("rolecall-sync.Page.Npc", { name: npc.name }),
+    content || placeholder("rolecall-sync.Empty.Details"),
+    OWNERSHIP.NONE,
+  );
 }
 
-function encounterPage(enc: EncounterPayload): PageData {
-  const content = metaRow("Type", enc.encounter_type) + section("Notes", enc.notes);
-  return textPage(`Encounter: ${enc.name}`, content || "<p><em>No details.</em></p>");
-}
-
-function lootPage(loot: LootCachePayload, index: number): PageData {
-  const content = metaRow("Currency", loot.currency) + section("Notes", loot.notes) +
-    (loot.description ? `<p>${esc(loot.description)}</p>` : "");
-  const title = loot.description ? loot.description.slice(0, 40) : `Loot #${index + 1}`;
-  return textPage(`Loot: ${title}`, content || "<p><em>No details.</em></p>");
-}
-
-function magicItemPage(item: MagicItemPayload): PageData {
+function encounterPage(enc: EncounterPayload): UnsortedPage {
   const content =
-    metaRow("Rarity", item.rarity) +
-    metaRow("Type", item.item_type) +
-    metaRow("Attunement", item.attunement ? "Required" : "None") +
-    section("Description", item.description) +
-    section("Notes", item.notes);
-  return textPage(`Item: ${item.name}`, content || "<p><em>No details.</em></p>");
+    metaRow("rolecall-sync.Field.EncounterType", enc.encounter_type) +
+    section("rolecall-sync.Field.Notes", enc.notes);
+  return textPage(
+    game.i18n.format("rolecall-sync.Page.Encounter", { name: enc.name }),
+    content || placeholder("rolecall-sync.Empty.Details"),
+    OWNERSHIP.NONE,
+  );
 }
 
+function lootPage(loot: LootCachePayload, index: number): UnsortedPage {
+  const content = metaRow("rolecall-sync.Field.Currency", loot.currency) +
+    section("rolecall-sync.Field.Notes", loot.notes) +
+    (loot.description ? `<p>${esc(loot.description)}</p>` : "");
+  const title = loot.description
+    ? loot.description.slice(0, 40)
+    : game.i18n.format("rolecall-sync.Page.LootUntitled", { number: index + 1 });
+  return textPage(
+    game.i18n.format("rolecall-sync.Page.Loot", { name: title }),
+    content || placeholder("rolecall-sync.Empty.Details"),
+    OWNERSHIP.NONE,
+  );
+}
+
+function magicItemPage(item: MagicItemPayload): UnsortedPage {
+  const attunement = game.i18n.localize(
+    item.attunement ? "rolecall-sync.Value.Required" : "rolecall-sync.Value.None",
+  );
+  const content =
+    metaRow("rolecall-sync.Field.Rarity", item.rarity) +
+    metaRow("rolecall-sync.Field.ItemType", item.item_type) +
+    metaRow("rolecall-sync.Field.Attunement", attunement) +
+    section("rolecall-sync.Field.Description", item.description) +
+    section("rolecall-sync.Field.Notes", item.notes);
+  return textPage(
+    game.i18n.format("rolecall-sync.Page.Item", { name: item.name }),
+    content || placeholder("rolecall-sync.Empty.Details"),
+    OWNERSHIP.NONE,
+  );
+}
+
+// Overview and read-aloud are the two pages meant for the table; everything
+// after them is prep the players must not read. Nothing here relies on the
+// entry staying GM-only, because it will not stay GM-only — showing read-aloud
+// means raising the entry, and only these levels survive that.
 function buildPages(scene: ScenePayload): PageData[] {
   const pages: PageData[] = [];
+  const push = (page: UnsortedPage) =>
+    pages.push({ ...page, sort: (pages.length + 1) * PAGE_SORT_STEP });
+
   const overview =
-    (scene.location ? metaRow("Location", scene.location.name) : "") +
-    (scene.chapter ? metaRow("Chapter", scene.chapter.title) : "");
-  if (overview) pages.push(textPage("Overview", overview));
-  if (scene.read_aloud) pages.push(textPage("Read-aloud", `<blockquote>${esc(scene.read_aloud)}</blockquote>`));
-  if (scene.gm_notes) pages.push(textPage("GM Notes", `<p>${esc(scene.gm_notes)}</p>`));
+    metaRow("rolecall-sync.Field.Location", scene.location?.name) +
+    metaRow("rolecall-sync.Field.Chapter", scene.chapter?.title);
+  if (overview) {
+    push(textPage(game.i18n.localize("rolecall-sync.Page.Overview"), overview, OWNERSHIP.OBSERVER));
+  }
+  if (scene.read_aloud) {
+    push(textPage(
+      game.i18n.localize("rolecall-sync.Page.ReadAloud"),
+      `<blockquote>${esc(scene.read_aloud)}</blockquote>`,
+      OWNERSHIP.OBSERVER,
+    ));
+  }
+  if (scene.gm_notes) {
+    push(textPage(
+      game.i18n.localize("rolecall-sync.Page.GmNotes"),
+      `<p>${esc(scene.gm_notes)}</p>`,
+      OWNERSHIP.NONE,
+    ));
+  }
 
-  scene.npcs.forEach((npc) => pages.push(npcPage(npc)));
-  scene.encounters.forEach((enc) => pages.push(encounterPage(enc)));
-  scene.loot_caches.forEach((loot, i) => pages.push(lootPage(loot, i)));
-  scene.magic_items.forEach((item) => pages.push(magicItemPage(item)));
+  scene.npcs.forEach((npc) => push(npcPage(npc)));
+  scene.encounters.forEach((enc) => push(encounterPage(enc)));
+  scene.loot_caches.forEach((loot, i) => push(lootPage(loot, i)));
+  scene.magic_items.forEach((item) => push(magicItemPage(item)));
 
-  if (!pages.length) pages.push(textPage("Overview", "<p><em>Empty scene.</em></p>"));
+  if (!pages.length) {
+    push(textPage(
+      game.i18n.localize("rolecall-sync.Page.Overview"),
+      placeholder("rolecall-sync.Empty.Scene"),
+      OWNERSHIP.OBSERVER,
+    ));
+  }
   return pages;
 }
 
 // Maps a Role Call scene to a single Foundry JournalEntry, one page per
 // read-aloud / GM-notes block and one per member. Flagged with the source
-// sceneId so the sync orchestrator can find & replace it on the next run.
+// sceneId so the sync orchestrator can find & reconcile it on the next run.
 export class JournalMapper implements SceneMapper {
   static readonly key = "journal";
   readonly key = JournalMapper.key;
 
-  async apply(scene: ScenePayload, folder: unknown, sort: number): Promise<void> {
-    await JournalEntry.create({
+  // No entry-level `ownership`: a new entry defaults to GM-only, and that is
+  // the floor this design wants. Setting it here would decide for the GM when
+  // their table gets to see the scene at all.
+  buildEntryData(scene: ScenePayload, folderId: string | null, sort: number): EntryData {
+    return {
       name: scene.name,
-      folder: (folder as { id?: string } | null)?.id ?? null,
+      folder: folderId,
       sort,
       pages: buildPages(scene),
       flags: {
         [MODULE_ID]: { sceneId: scene.id, syncedAt: new Date().toISOString() },
       },
-    });
+    };
   }
 }

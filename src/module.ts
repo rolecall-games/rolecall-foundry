@@ -38,7 +38,9 @@ Hooks.on("renderJournalDirectory", (_app: unknown, html: unknown) => {
   const button = document.createElement("button");
   button.type = "button";
   button.className = `${MODULE_ID}-sync-btn`;
-  button.innerHTML = `<i class="fas fa-cloud-arrow-down"></i> Sync from Role Call`;
+  button.innerHTML = `<i class="fas fa-cloud-arrow-down"></i> ${game.i18n.localize(
+    "rolecall-sync.Sidebar.SyncButton",
+  )}`;
   button.addEventListener("click", () => {
     void runSync();
   });

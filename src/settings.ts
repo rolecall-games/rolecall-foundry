@@ -17,8 +17,8 @@ import { runSync } from "./sync";
 // the whole trade, and sync is already a manual GM-gated action either way.
 export function registerSettings(): void {
   game.settings.register(MODULE_ID, SETTINGS.apiBaseUrl, {
-    name: "RC.Settings.ApiBaseUrl.Name",
-    hint: "RC.Settings.ApiBaseUrl.Hint",
+    name: "rolecall-sync.Settings.ApiBaseUrl.Name",
+    hint: "rolecall-sync.Settings.ApiBaseUrl.Hint",
     scope: "world",
     config: true,
     type: String,
@@ -26,8 +26,8 @@ export function registerSettings(): void {
   });
 
   game.settings.register(MODULE_ID, SETTINGS.apiToken, {
-    name: "RC.Settings.ApiToken.Name",
-    hint: "RC.Settings.ApiToken.Hint",
+    name: "rolecall-sync.Settings.ApiToken.Name",
+    hint: "rolecall-sync.Settings.ApiToken.Hint",
     scope: "client",
     config: true,
     type: String,
@@ -38,9 +38,9 @@ export function registerSettings(): void {
   // sign up) in the browser, pick or create a campaign, and the token lands
   // here by itself. Pasting a token stays available as the manual fallback.
   game.settings.registerMenu(MODULE_ID, "connect", {
-    name: "RC.Settings.Connect.Name",
-    label: "RC.Settings.Connect.Label",
-    hint: "RC.Settings.Connect.Hint",
+    name: "rolecall-sync.Settings.Connect.Name",
+    label: "rolecall-sync.Settings.Connect.Label",
+    hint: "rolecall-sync.Settings.Connect.Hint",
     icon: "fas fa-plug",
     type: ConnectMenu,
     restricted: true,
@@ -48,9 +48,9 @@ export function registerSettings(): void {
 
   // A button in the module settings pane that triggers a sync immediately.
   game.settings.registerMenu(MODULE_ID, "syncNow", {
-    name: "RC.Settings.SyncNow.Name",
-    label: "RC.Settings.SyncNow.Label",
-    hint: "RC.Settings.SyncNow.Hint",
+    name: "rolecall-sync.Settings.SyncNow.Name",
+    label: "rolecall-sync.Settings.SyncNow.Label",
+    hint: "rolecall-sync.Settings.SyncNow.Hint",
     icon: "fas fa-cloud-arrow-down",
     type: SyncNowMenu,
     restricted: true,

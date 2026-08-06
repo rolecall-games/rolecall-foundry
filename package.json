@@ -1,5 +1,5 @@
 {
-  "name": "rolecall-foundry-sync",
+  "name": "rolecall-foundry",
   "version": "0.1.0",
   "description": "Foundry VTT module that pulls Role Call campaign scenes into the world as journal entries.",
   "type": "module",

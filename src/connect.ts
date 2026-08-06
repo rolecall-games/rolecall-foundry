@@ -44,17 +44,21 @@ async function startConnect(baseUrl: string): Promise<ConnectStart> {
       }),
     });
   } catch {
-    throw new RoleCallConnectError(`Couldn't reach Role Call at ${baseUrl}.`);
+    throw new RoleCallConnectError(
+      game.i18n.format("rolecall-sync.Connect.Error.Unreachable", { url: baseUrl }),
+    );
   }
 
   if (res.status === 429) {
-    throw new RoleCallConnectError("Too many connect attempts — wait a few minutes and retry.");
+    throw new RoleCallConnectError(game.i18n.localize("rolecall-sync.Connect.Error.RateLimited"));
   }
   if (res.status === 409) {
-    throw new RoleCallConnectError("This module version is out of date — update Role Call Sync.");
+    throw new RoleCallConnectError(game.i18n.localize("rolecall-sync.Connect.Error.OutOfDate"));
   }
   if (!res.ok) {
-    throw new RoleCallConnectError(`Role Call returned HTTP ${res.status}.`);
+    throw new RoleCallConnectError(
+      game.i18n.format("rolecall-sync.Connect.Error.Http", { status: res.status }),
+    );
   }
 
   return (await res.json()) as ConnectStart;
@@ -90,21 +94,23 @@ function openOverlay(start: ConnectStart, popupOpened: boolean, state: { cancell
     const overlay = document.createElement("div");
     overlay.className = `${MODULE_ID}-connect-overlay`;
 
-    const lead = popupOpened
-      ? "Finish connecting in the browser tab that just opened."
-      : "Your browser blocked the popup — open the link below to continue.";
+    const lead = game.i18n.localize(
+      popupOpened
+        ? "rolecall-sync.Connect.Overlay.LeadPopup"
+        : "rolecall-sync.Connect.Overlay.LeadBlocked",
+    );
 
     overlay.innerHTML = `
       <div class="${MODULE_ID}-connect-card">
-        <h2>Connect to Role Call</h2>
+        <h2>${game.i18n.localize("rolecall-sync.Connect.Overlay.Title")}</h2>
         <p>${lead}</p>
         <p class="${MODULE_ID}-connect-code">${start.user_code}</p>
         <p>
           <a href="${start.connect_url}" target="_blank" rel="noopener">${start.connect_url}</a><br>
-          If the code shown there doesn't match the one above, stop.
+          ${game.i18n.localize("rolecall-sync.Connect.Overlay.VerifyCode")}
         </p>
-        <p class="${MODULE_ID}-connect-status">Waiting for approval…</p>
-        <button type="button" class="${MODULE_ID}-connect-cancel">Cancel</button>
+        <p class="${MODULE_ID}-connect-status">${game.i18n.localize("rolecall-sync.Connect.Overlay.Waiting")}</p>
+        <button type="button" class="${MODULE_ID}-connect-cancel">${game.i18n.localize("rolecall-sync.Connect.Overlay.Cancel")}</button>
       </div>
     `;
 
@@ -137,13 +143,13 @@ function openOverlay(start: ConnectStart, popupOpened: boolean, state: { cancell
 // (the caller decides whether that means "run the first sync now").
 export async function runConnect(opts: { onConnected?: () => void } = {}): Promise<void> {
   if (!game.user?.isGM) {
-    ui.notifications?.warn("Role Call: only a GM can connect this world.");
+    ui.notifications?.warn(game.i18n.localize("rolecall-sync.Connect.Notify.GmOnly"));
     return;
   }
 
   const baseUrl = getApiBaseUrl();
   if (!baseUrl) {
-    ui.notifications?.error("Role Call: set the API base URL in module settings first.");
+    ui.notifications?.error(game.i18n.localize("rolecall-sync.Connect.Notify.NoBaseUrl"));
     return;
   }
 
@@ -152,9 +158,11 @@ export async function runConnect(opts: { onConnected?: () => void } = {}): Promi
     start = await startConnect(baseUrl);
   } catch (err) {
     const message =
-      err instanceof RoleCallConnectError ? err.message : "Connect failed — see the console.";
+      err instanceof RoleCallConnectError
+        ? err.message
+        : game.i18n.localize("rolecall-sync.Connect.Error.Unknown");
     console.error("Role Call Sync:", err);
-    ui.notifications?.error(`Role Call: ${message}`);
+    ui.notifications?.error(game.i18n.format("rolecall-sync.Connect.Notify.Failed", { message }));
     return;
   }
 
@@ -163,7 +171,9 @@ export async function runConnect(opts: { onConnected?: () => void } = {}): Promi
   const overlay = openOverlay(start, !!popup, state);
   if (!popup && !overlay) {
     // Popup blocked AND no overlay: the URL would be unreachable. Surface it.
-    ui.notifications?.warn(`Role Call: open ${start.connect_url} to approve the connection.`);
+    ui.notifications?.warn(
+      game.i18n.format("rolecall-sync.Connect.Notify.OpenUrl", { url: start.connect_url }),
+    );
   }
 
   const deadline = Date.now() + start.expires_in_seconds * 1000;
@@ -193,30 +203,32 @@ export async function runConnect(opts: { onConnected?: () => void } = {}): Promi
         case "approved":
           await game.settings.set(MODULE_ID, SETTINGS.apiToken, poll.token);
           overlay?.close();
-          ui.notifications?.info(`Role Call: connected to “${poll.game.name}”.`);
+          ui.notifications?.info(
+            game.i18n.format("rolecall-sync.Connect.Notify.Connected", { name: poll.game.name }),
+          );
           opts.onConnected?.();
           return;
 
         case "denied":
           overlay?.close();
-          ui.notifications?.warn("Role Call: the connect request was denied on the website.");
+          ui.notifications?.warn(game.i18n.localize("rolecall-sync.Connect.Notify.Denied"));
           return;
 
         case "consumed":
           overlay?.close();
-          ui.notifications?.warn("Role Call: that connect request was already used — start again.");
+          ui.notifications?.warn(game.i18n.localize("rolecall-sync.Connect.Notify.Consumed"));
           return;
 
         case "expired":
           overlay?.close();
-          ui.notifications?.warn("Role Call: the connect request expired — click Connect again.");
+          ui.notifications?.warn(game.i18n.localize("rolecall-sync.Connect.Notify.Expired"));
           return;
       }
     }
 
     if (!state.cancelled) {
       overlay?.close();
-      ui.notifications?.warn("Role Call: the connect request expired — click Connect again.");
+      ui.notifications?.warn(game.i18n.localize("rolecall-sync.Connect.Notify.Expired"));
     }
   } finally {
     // Whatever path exits the loop, never leave a dead overlay behind.
