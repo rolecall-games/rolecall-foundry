@@ -1,7 +1,7 @@
 {
   "id": "rolecall-sync",
   "title": "RoleCall Sync",
-  "description": "Pull your RoleCall campaign prep into Foundry as journal entries — scenes (read-aloud, GM notes, NPCs, encounters, loot, magic items) and campaign lore notes, filed under a single RoleCall folder. Does not import maps.",
+  "description": "The prep you already wrote on RoleCall, waiting in Foundry when you sit down to run. Every scene becomes a Journal Entry — read-aloud text, your GM notes, and a page for each NPC, encounter, loot cache and magic item — plus your campaign lore notes, filed under one RoleCall folder. Entries are split into player-safe pages and GM-only ones, so handing the party a scene mid-session shows them the boxed text and nothing behind it. Does not import maps: a RoleCall scene is narrative prep, not a battlemap, and carries no map art. Requires a free account at https://rolecall.games.",
   "version": "0.1.0",
   "authors": [
     {

@@ -1,9 +1,18 @@
 # RoleCall Sync (Foundry VTT)
 
-A Foundry VTT module (**v13 & v14**) that pulls your [RoleCall](https://rolecall.games) campaign
-prep into your world as **journal entries**. Each scene becomes a Journal Entry with pages for the
-read-aloud text, your GM notes, and every member (NPCs, encounters, loot caches, magic items); each
-of your campaign **lore notes** becomes an entry alongside them.
+The prep you already wrote on [RoleCall](https://rolecall.games), waiting in Foundry when you sit
+down to run. Every scene arrives as a Journal Entry — read-aloud text, your GM notes, and a page for
+each NPC, encounter, loot cache and magic item you hung on it. Your campaign lore notes come across
+too. Foundry **v13 & v14**.
+
+**Your table sees the read-aloud. They do not see the rest.** Each entry is split into player-safe
+pages and GM-only ones, so handing the party a scene mid-session shows them the boxed text and
+nothing behind it — not the NPC's real motive, not the encounter, not what's in the chest. Share the
+entry, keep the twist.
+
+**It does not import maps.** A RoleCall scene is a prep bundle — read-aloud, notes, a location, and
+the people and things in it — not a battlemap, and it carries no map art to bring over. If you came
+looking for scene backgrounds, this is not that module.
 
 Everything lands under a single top-level **RoleCall** folder, with one child folder per campaign:
 
